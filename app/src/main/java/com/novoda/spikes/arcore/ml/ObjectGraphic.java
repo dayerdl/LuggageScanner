@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package com.novoda.spikes.arcore;
+package com.novoda.spikes.arcore.ml;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 
-
 import com.google.mlkit.vision.objects.DetectedObject;
 import com.google.mlkit.vision.objects.DetectedObject.Label;
+import com.novoda.spikes.arcore.GraphicOverlay;
 
 import java.util.Locale;
 

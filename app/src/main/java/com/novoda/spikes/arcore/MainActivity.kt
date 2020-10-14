@@ -12,11 +12,14 @@ import androidx.camera.core.ImageProxy
 import com.google.ar.core.Session
 import com.google.ar.core.exceptions.CameraNotAvailableException
 import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.objects.defaults.ObjectDetectorOptions
 import com.novoda.spikes.arcore.google.helper.TapHelper
 import com.novoda.spikes.arcore.helper.ARCoreDependenciesHelper
 import com.novoda.spikes.arcore.helper.ARCoreDependenciesHelper.Result.Failure
 import com.novoda.spikes.arcore.helper.ARCoreDependenciesHelper.Result.Success
 import com.novoda.spikes.arcore.helper.CameraPermissionHelper
+import com.novoda.spikes.arcore.ml.ObjectDetectorProcessor
+import com.novoda.spikes.arcore.ml.VisionImageProcessor
 import com.novoda.spikes.arcore.rendering.NovodaSurfaceViewRenderer
 import kotlinx.android.synthetic.main.activity_main.*
 import java.nio.IntBuffer
@@ -27,7 +30,8 @@ import javax.microedition.khronos.opengles.GL10
 
 class MainActivity : AppCompatActivity() {
     private var session: Session? = null
-    private var imageAnalyzer: ImageAnalyzer? = null
+    private var imageAnalyzer: VisionImageProcessor? = null
+
 
     private val renderer: NovodaSurfaceViewRenderer by lazy {
         NovodaSurfaceViewRenderer(this, debugViewDisplayer, tapHelper)
@@ -87,14 +91,17 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         setupSurfaceView()
 
-        imageAnalyzer = ImageAnalyzer()
+        val options = ObjectDetectorOptions.Builder()
+                .setDetectorMode(ObjectDetectorOptions.SINGLE_IMAGE_MODE)
+                .enableClassification()  // Optional
+                .build()
+        imageAnalyzer = ObjectDetectorProcessor(this, options)
 
         testButton.setOnClickListener {
             captureBitmap(object : BitmapReadyCallbacks {
                 override fun onBitmapReady(bitmap: Bitmap?) {
                     testImageView.setImageBitmap(bitmap)
-                    val image = InputImage.fromBitmap(bitmap!!, 0)
-                    imageAnalyzer!!.analyze(image)
+                    imageAnalyzer!!.processBitmap(bitmap!!, graphic_overlay)
                 }
             })
         }
