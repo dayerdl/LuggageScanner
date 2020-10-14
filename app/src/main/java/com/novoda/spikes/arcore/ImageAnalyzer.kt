@@ -5,28 +5,27 @@ import android.content.Context.CAMERA_SERVICE
 import android.hardware.camera2.CameraAccessException
 import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CameraManager
-import android.media.Image
 import android.os.Build
 import android.util.SparseIntArray
 import android.view.Surface
 import androidx.annotation.RequiresApi
-import androidx.camera.core.ImageAnalysis
-import androidx.camera.core.ImageProxy
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.objects.ObjectDetection
 import com.google.mlkit.vision.objects.ObjectDetector
 import com.google.mlkit.vision.objects.defaults.ObjectDetectorOptions
 
-class ImageAnalyzer : ImageAnalysis.Analyzer {
+class ImageAnalyzer {
+
     private var objectDetector: ObjectDetector
 
     init {
         val options = ObjectDetectorOptions.Builder()
-                .setDetectorMode(ObjectDetectorOptions.STREAM_MODE)
+                .setDetectorMode(ObjectDetectorOptions.SINGLE_IMAGE_MODE)
                 .enableClassification()  // Optional
                 .build()
         objectDetector = ObjectDetection.getClient(options)
     }
+
     private val ORIENTATIONS = SparseIntArray()
 
     init {
@@ -35,6 +34,7 @@ class ImageAnalyzer : ImageAnalysis.Analyzer {
         ORIENTATIONS.append(Surface.ROTATION_180, 180)
         ORIENTATIONS.append(Surface.ROTATION_270, 270)
     }
+
 
     /**
      * Get the angle by which an image must be rotated given the device's current
@@ -72,14 +72,9 @@ class ImageAnalyzer : ImageAnalysis.Analyzer {
                         // ...
                     }
                     .addOnFailureListener { e ->
-                        // Task failed with an exception
-                        // ...
+                        println("exception $e")
                     }
         }
-    }
-
-    override fun analyze(image: ImageProxy) {
-        
     }
 
 
