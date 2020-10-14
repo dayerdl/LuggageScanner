@@ -5,6 +5,7 @@ import android.content.Context.CAMERA_SERVICE
 import android.hardware.camera2.CameraAccessException
 import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CameraManager
+import android.media.Image
 import android.os.Build
 import android.util.SparseIntArray
 import android.view.Surface
@@ -62,20 +63,23 @@ class ImageAnalyzer : ImageAnalysis.Analyzer {
         return rotationCompensation
     }
 
-    override fun analyze(imageProxy: ImageProxy) {
-//        val mediaImage = imageProxy.image
-//        if (mediaImage != null) {
-//            val image = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
-//            objectDetector.process(image)
-//                    .addOnSuccessListener { detectedObjects ->
-//                        // Task completed successfully
-//                        // ...
-//                    }
-//                    .addOnFailureListener { e ->
-//                        // Task failed with an exception
-//                        // ...
-//                    }
-//        }
+    fun analyze(inputImage: InputImage) {
+        if (inputImage != null) {
+            objectDetector.process(inputImage)
+                    .addOnSuccessListener { detectedObjects ->
+                        // Task completed successfully
+                        println("Detected ${detectedObjects.size}")
+                        // ...
+                    }
+                    .addOnFailureListener { e ->
+                        // Task failed with an exception
+                        // ...
+                    }
+        }
+    }
+
+    override fun analyze(image: ImageProxy) {
+        
     }
 
 

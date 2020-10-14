@@ -1,13 +1,17 @@
 package com.novoda.spikes.arcore
 
 import android.graphics.Bitmap
+import android.media.Image
 import android.opengl.GLException
 import android.opengl.GLSurfaceView
 import android.os.Bundle
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.camera.core.ImageProxy
 import com.google.ar.core.Session
 import com.google.ar.core.exceptions.CameraNotAvailableException
+import com.google.mlkit.vision.common.InputImage
 import com.novoda.spikes.arcore.google.helper.TapHelper
 import com.novoda.spikes.arcore.helper.ARCoreDependenciesHelper
 import com.novoda.spikes.arcore.helper.ARCoreDependenciesHelper.Result.Failure
@@ -23,6 +27,8 @@ import javax.microedition.khronos.opengles.GL10
 
 class MainActivity : AppCompatActivity() {
     private var session: Session? = null
+    private var imageAnalyzer: ImageAnalyzer? = null
+
     private val renderer: NovodaSurfaceViewRenderer by lazy {
         NovodaSurfaceViewRenderer(this, debugViewDisplayer, tapHelper)
     }
@@ -31,7 +37,6 @@ class MainActivity : AppCompatActivity() {
     private interface BitmapReadyCallbacks {
         fun onBitmapReady(bitmap: Bitmap?)
     }
-
 
     // supporting methods
     private fun captureBitmap(bitmapReadyCallbacks: BitmapReadyCallbacks) {
@@ -82,10 +87,14 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         setupSurfaceView()
 
+        imageAnalyzer = ImageAnalyzer()
+
         testButton.setOnClickListener {
             captureBitmap(object : BitmapReadyCallbacks {
                 override fun onBitmapReady(bitmap: Bitmap?) {
                     testImageView.setImageBitmap(bitmap)
+                    val image = InputImage.fromBitmap(bitmap!!, 0)
+                    imageAnalyzer!!.analyze(image)
                 }
             })
         }
